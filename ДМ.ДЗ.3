@@ -1,0 +1,263 @@
+using System;
+using System.IO;
+
+namespace ДМ.ДЗ._3
+{
+    public class Combinatorics
+    {
+        private int[] swap(int[] Com, int j, int k)
+        {
+            int x = Com[j];
+            Com[j] = Com[k];
+            Com[k] = x;
+            return Com;
+        }
+
+        public bool hasNext(int[] Com, int n) //Проверка на то, что мы дошли до максимального значения
+        {
+            bool ok = false;
+            foreach (int i in Com)
+            {
+                if (i != n)
+                {
+                    ok = true;
+                }
+            }
+            return ok;
+        }
+
+        public bool hasNextSochet(int[] Com, int n)
+        {
+            if (Com[Com.Length - 1] > n) return false;
+            else return true;
+        }
+        public int[] RazWithPovtor(int[] Com, int n, int m) //размещения с повторениями
+        {
+            while (Com[m - 1] == n)
+            {
+                Com[m - 1] = 1;
+                m--;
+            }
+            Com[m - 1]++;
+            return Com;
+        }
+        public bool RazWithoutPov(int[] Com, int n, int m) //размещения без повторений
+        {
+            int j = n - 2;
+            do
+            {
+                while (j != -1 && Com[j] >= Com[j + 1])
+                    j--;
+                if (j == -1) return false;
+                int k = n - 1;
+                while (Com[j] >= Com[k])
+                    k--;
+                Com = swap(Com, j, k);
+                int l = j + 1, r = n - 1;// сортируем оставшуюся часть последовательности
+                while (l < r)
+                    Com = swap(Com, l++, r--);
+
+
+            } while (j > m - 1);
+            return true;
+
+        }
+        // сочетание с повторениями
+        public int[] SochetWithPov(int[] Com, int n, int m)
+        {
+
+            while (Com[m - 1] == n)
+            {
+                Com[m - 1] = 1;
+                m--;
+            }
+            Com[m - 1]++;
+            for (int i = m - 1; i < Com.Length; i++)
+            {
+                Com[i] = Com[m - 1];
+            }
+            return Com;
+        }
+        // сочетание с повторениями
+        public int[] SochetwioutPov(int[] Com, int n, int lenth)
+        {
+            bool b = false;
+            do
+            {
+                b = false;
+                Com[0]++;
+                for (int i = 0; i < lenth; i++)
+                {
+                    if (Com[i] >= n)
+                    {
+                        Com[i] = 1;
+                        Com[i + 1]++;
+                    }
+                }
+                for (int i = 0; i < lenth - 1; i++)
+                {
+                    if (Com[i] >= Com[i + 1])
+                    {
+                        b = true;
+                    }
+                }
+
+            } while (b);
+            return Com;
+
+        }
+
+        public void OutArr(int[] Com, string bunch, StreamWriter file) // Вывод слова на экран
+        {
+            file.WriteLine();
+            for (int i = 0; i < Com.Length; i++)
+            {
+                file.Write($"{bunch[Com[i] - 1]}");
+            }
+        }
+
+        public void OutArr(int[] Com, string bunch, int m, StreamWriter file) // Вывод слова на экран
+        {
+            file.WriteLine();
+            for (int i = 0; i < m; i++)
+            {
+                file.Write($"{bunch[Com[i] - 1]}");
+            }
+        }
+    }
+
+    class Program
+    {
+            static int[] Iniz1(int[] Com) // Заполнение слова единицами
+            {
+                for (int i = 0; i < Com.Length; i++)
+                {
+                    Com[i] = 1;
+                }
+                return Com;
+            }
+
+            static int[] InizPos(int[] com)
+            {
+                for (int i = 0; i < com.Length; i++)
+                {
+                    com[i] = i + 1;
+                }
+                return com;
+            }
+        static void Main(string[] args)
+        {
+            StreamWriter f = new StreamWriter(@"D:\File3.txt");
+
+            Combinatorics combinatorics = new Combinatorics();
+
+            string bunch = "abcdef";
+           
+            int n = 5, m1 = 4;
+
+          
+            for(int i=3;i<=4;i++)
+            {
+                
+                int[] comA = new int[i + 1];
+                Iniz1(comA);
+                comA[i] = m1 + 1;
+                combinatorics.SochetwioutPov(comA, m1 + 1, i);
+
+                f.WriteLine($"\nСлдова длины 4, в которых {i} ,букв а ");
+
+                do
+                {
+                    int[] Com = new int[4];
+                    for (int j = 0; j < i; j++) //ранее мы узнали на каких местах стоит буква а и теперь мы её ставим в слово.
+                    {
+                        Com[comA[j] - 1] = 1;
+                    }
+                    int[] ComBunch = new int[4 - i];
+                    Iniz1(ComBunch);
+                    while (combinatorics.hasNext(ComBunch, n))
+                    {
+                        int j = 0;
+                        for (int z = 0; z < 4; z++)
+                        {
+                            if (Com[z] != 1)
+                            {
+                                Com[z] = ComBunch[j] + 1;
+                                j++;
+                            }
+                        }
+                        combinatorics.OutArr(Com, bunch, f);
+                        combinatorics.RazWithPovtor(ComBunch, n, 4 - i);
+                    }
+                    int k = 0;
+                    for (int j = 0; j < 4; j++)
+                    {
+                        if (Com[j] != 1)
+                        {
+                            Com[j] = ComBunch[k] + 1;
+                            k++;
+                        }
+                    }
+                    combinatorics.OutArr(Com, bunch, f);
+                    combinatorics.SochetwioutPov(comA, m1 + 1, i);
+
+                } while (combinatorics.hasNextSochet(comA, m1 + 1));
+
+
+            }
+//-----------------------------------------------------------------------------------------------------------------
+            int m2 = 7;
+
+            for (int i = 3; i <= 7; i++)
+            {
+
+                int[] comA = new int[i + 1];
+                Iniz1(comA);
+                comA[i] = m2 + 1;
+                combinatorics.SochetwioutPov(comA, m2 + 1, i);
+
+                f.WriteLine($"\nСлдова длины 7, в которых {i} ,букв а ");
+
+                do
+                {
+                    int[] Com = new int[7];
+                    for (int j = 0; j < i; j++) //ранее мы узнали на каких местах стоит буква а и теперь мы её ставим в слово.
+                    {
+                        Com[comA[j] - 1] = 1;
+                    }
+                    int[] ComBunch = new int[7 - i];
+                    Iniz1(ComBunch);
+                    while (combinatorics.hasNext(ComBunch, n))
+                    {
+                        int j = 0;
+                        for (int z = 0; z < 7; z++)
+                        {
+                            if (Com[z] != 1)
+                            {
+                                Com[z] = ComBunch[j] + 1;
+                                j++;
+                            }
+                        }
+                        combinatorics.OutArr(Com, bunch, f);
+                        combinatorics.RazWithPovtor(ComBunch, n, 7 - i);
+                    }
+                    int k = 0;
+                    for (int j = 0; j < 7; j++)
+                    {
+                        if (Com[j] != 1)
+                        {
+                            Com[j] = ComBunch[k] + 1;
+                            k++;
+                        }
+                    }
+                    combinatorics.OutArr(Com, bunch, f);
+                    combinatorics.SochetwioutPov(comA, m2 + 1, i);
+
+                } while (combinatorics.hasNextSochet(comA, m2 + 1));
+
+
+            }
+            f.Close();
+        }
+    }
+}
