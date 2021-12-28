@@ -180,13 +180,23 @@ namespace ДМ.ДЗ._2
                     combinatorics.RazWithPovtor(ComBunch,n,3);
                   
                 }
-                                
+                int k = 0;
+                for (int i = 0; i < 5; i++)
+                {
+                    if (i != ComA[0] - 1 && i != ComA[1] - 1)
+                    {
+                        Com[i] = ComBunch[k] + 1;
+                        k++;
+                    }
+                }
+                combinatorics.OutArr(Com, bunch, f);
+
                 combinatorics.SochetwioutPov(ComA, n + 1, 2);
 
             } while (combinatorics.hasNextSochet(ComA,n+1));
 
             
-            f.WriteLine("\nПостроить все слова длины 5, в которых ровно 2 буквы a, остальные буквы не повторяются.");
+            f.WriteLine("\nвсе слова длины 5, в которых ровно 2 буквы a, остальные буквы не повторяются.");
 
             Com = new int[m];
             ComA = new int[3];
