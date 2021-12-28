@@ -1,0 +1,224 @@
+using System;
+using System.IO;
+namespace ДМ.ДЗ._2
+{
+    public class Combinatorics
+    {
+        private int[] swap(int[] Com, int j, int k)
+        {
+            int x = Com[j];
+            Com[j] = Com[k];
+            Com[k] = x;
+            return Com;
+        }
+
+        public bool hasNext(int[] Com, int n) //Проверка на то, что мы дошли до максимального значения
+        {
+            bool ok = false;
+            foreach (int i in Com)
+            {
+                if (i != n)
+                {
+                    ok = true;
+                }
+            }
+            return ok;
+        }
+
+        public bool hasNextSochet(int[] Com, int n)
+        {
+            if (Com[Com.Length - 1] > n) return false;
+            else return true;
+        }
+        public int[] RazWithPovtor(int[] Com, int n, int m) //размещения с повторениями
+        {
+            while (Com[m - 1] == n)
+            {
+                Com[m - 1] = 1;
+                m--;
+            }
+            Com[m - 1]++;
+            return Com;
+        }
+        public bool RazWithoutPov(int[] Com, int n, int m) //размещения без повторений
+        {
+            int j = n - 2;
+            do
+            {
+                while (j != -1 && Com[j] >= Com[j + 1])
+                    j--;
+                if (j == -1) return false;
+                int k = n - 1;
+                while (Com[j] >= Com[k])
+                    k--;
+                Com = swap(Com, j, k);
+                int l = j + 1, r = n - 1;// сортируем оставшуюся часть последовательности
+                while (l < r)
+                    Com = swap(Com, l++, r--);
+
+
+            } while (j > m - 1);
+            return true;
+
+        }
+        // сочетание с повторениями
+        public int[] SochetWithPov(int[] Com, int n, int m)
+        {
+
+            while (Com[m - 1] == n)
+            {
+                Com[m - 1] = 1;
+                m--;
+            }
+            Com[m - 1]++;
+            for (int i = m - 1; i < Com.Length; i++)
+            {
+                Com[i] = Com[m - 1];
+            }
+            return Com;
+        }
+        // сочетание с повторениями
+        public int[] SochetwioutPov(int[] Com, int n, int lenth)
+        {
+            bool b = false;
+            do
+            {
+                b = false;
+                Com[0]++;
+                for (int i = 0; i < lenth; i++)
+                {
+                    if (Com[i] >= n)
+                    {
+                        Com[i] = 1;
+                        Com[i + 1]++;
+                    }
+                }
+                for (int i = 0; i < lenth - 1; i++)
+                {
+                    if (Com[i] >= Com[i + 1])
+                    {
+                        b = true;
+                    }
+                }
+
+            } while (b);
+            return Com;
+
+        }
+
+        public void OutArr(int[] Com, string bunch,StreamWriter file) // Вывод слова на экран
+        {
+            file.WriteLine();
+            for (int i = 0; i < Com.Length; i++)
+            {
+                file.Write($"{bunch[Com[i] - 1]}");
+            }
+        }
+
+        public void OutArr(int[] Com, string bunch, int m, StreamWriter file) // Вывод слова на экран
+        {
+            file.WriteLine();
+            for (int i = 0; i < m; i++)
+            {
+                file.Write($"{bunch[Com[i] - 1]}");
+            }
+        }
+    }
+    class Program
+    {
+        static int[] Iniz1(int[] Com) // Заполнение слова единицами
+        {
+            for (int i = 0; i < Com.Length; i++)
+            {
+                Com[i] = 1;
+            }
+            return Com;
+        }
+
+        static int[] InizPos(int[] com)
+        {
+            for (int i = 0; i < com.Length; i++)
+            {
+                com[i] = i + 1;
+            }
+            return com;
+        }
+        static void Main(string[] args)
+        {
+            StreamWriter f = new StreamWriter(@"D:\File2.txt");
+
+            Combinatorics combinatorics = new Combinatorics();
+            int n = 5;// мощность множества без a 
+            int m = 5; // длина слова
+            string bunch ="abcdef";
+            int[] Com = new int[m];
+
+
+            int[] ComA = new int[3];
+            Iniz1(ComA);
+            ComA[2] = n+1;
+            combinatorics.SochetwioutPov(ComA, n+1, 2);
+
+            f.WriteLine("Построить все слова длины 5, в которых ровно две буквы а ");
+            do
+            {
+                Com[ComA[0]-1] = 1; Com[ComA[1]-1] = 1;
+                int[] ComBunch = new int[3];
+                Iniz1(ComBunch);
+                while(combinatorics.hasNext(ComBunch,n))
+                {
+                    int j = 0;
+                    for(int i=0;i<5;i++)
+                    {
+                        if(i!=ComA[0]-1&& i!=ComA[1]-1)
+                        {
+                            Com[i] = ComBunch[j]+1;
+                            j++;
+                        }
+                    }
+                    combinatorics.OutArr(Com, bunch,f);
+                    combinatorics.RazWithPovtor(ComBunch,n,3);
+                  
+                }
+                                
+                combinatorics.SochetwioutPov(ComA, n + 1, 2);
+
+            } while (combinatorics.hasNextSochet(ComA,n+1));
+
+            
+            f.WriteLine("\nПостроить все слова длины 5, в которых ровно 2 буквы a, остальные буквы не повторяются.");
+
+            Com = new int[m];
+            ComA = new int[3];
+            Iniz1(ComA);
+            ComA[2] = n + 1;
+            combinatorics.SochetwioutPov(ComA, n + 1, 2);
+            do
+            {
+                Com[ComA[0] - 1] = 1; Com[ComA[1] - 1] = 1;
+                int[] ComBunch = new int[n];
+                InizPos(ComBunch);
+                while (combinatorics.RazWithoutPov(ComBunch, n, 3))
+                {
+                    int j = 0;
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (i != ComA[0] - 1 && i != ComA[1] - 1)
+                        {
+                            Com[i] = ComBunch[j] + 1;
+                            j++;
+                        }
+                    }
+                    combinatorics.OutArr(Com, bunch,f);
+                }
+                combinatorics.SochetwioutPov(ComA, n + 1, 2);
+
+            } while (combinatorics.hasNextSochet(ComA, n + 1));
+
+
+            f.Close();
+        }
+
+
+    }
+}
