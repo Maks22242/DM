@@ -223,13 +223,14 @@ namespace ДЗ._1
             for (int i = 1; i < n; i++)
             {
                 int[] arr = new int[i + 1];
-                Iniz1(arr);
+                InizPos(arr);
                 arr[i] = n + 1;
 
                 do
                 {
-                    combinatorics.SochetwioutPov(arr, n + 1, i);
                     combinatorics.OutArr(arr, bunch, i, f);
+                    combinatorics.SochetwioutPov(arr, n + 1, i);
+                    
 
                 } while (combinatorics.hasNextSochet(arr, n + 1));
             }
